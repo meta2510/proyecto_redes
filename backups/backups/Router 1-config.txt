@@ -1,0 +1,118 @@
+Building configuration...
+
+Current configuration : 1491 bytes
+!
+! Last configuration change at 23:19:29 UTC Sat Nov 13 2021 by ansible
+upgrade fpd auto
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+ip domain name redes.org
+ip name-server 8.8.8.8
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+username ansible privilege 15 secret 5 $1$ATcL$yf58/qt4guOJh22HhqZqZ/
+!
+redundancy
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/0
+ ip address 192.168.116.20 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly in
+ duplex half
+!
+interface FastEthernet1/0
+ ip address dhcp
+ ip nat outside
+ ip virtual-reassembly in
+ duplex half
+!
+router ospf 1
+ network 192.0.0.0 0.255.255.255 area 0
+ default-information originate
+!
+ip forward-protocol nd
+no ip http server
+no ip http secure-server
+!
+!
+!
+access-list 1 permit 192.0.0.0 0.255.255.255
+no cdp log mismatch duplex
+!
+!
+!
+control-plane
+!
+!
+!
+mgcp profile default
+!
+!
+!
+gatekeeper
+ shutdown
+!
+banner motd ^C //////////////////////////////
+////////// Router 1 //////////
+////////////////////////////// ^C
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line aux 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh
+!
+!
+end

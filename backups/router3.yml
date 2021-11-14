@@ -1,0 +1,73 @@
+---
+- name: Playbook para configurar un router CISCO en GNS3
+  connection: network_cli
+  hosts: device_roles_router3
+  gather_facts: False
+
+  tasks:
+  
+    - name: Cambiar el banner del login
+      ios_command:
+        commands:
+          - configure terminal
+          - banner motd c
+              //////////////////////////////
+              
+              ////////// Router 3 //////////
+              
+              //////////////////////////////
+              c
+          - end
+
+    - name: Configuraciones globales del Router2
+
+      ios_command:
+        commands:
+          - configure terminal
+          - Interface FastEthernet 1/0
+          - ip address 192.168.117.1 255.255.255.0
+          - no shutdown
+          - exit
+          - ip domain-lookup
+          - ip name-server 8.8.8.8
+          - exit
+          - configure terminal
+          - router ospf 1
+          - network 192.0.0.0 0.255.255.255 area 0
+          - default-information originate
+          - exit
+          - router eigrp 1
+          - no auto-summary
+          - passive-interface default
+          - network 192.168.116.22 0.0.0.0
+          - network 192.168.117.1 0.0.0.0
+          - no passive-interface fastethernet 0/0
+          - end
+          
+    - name: Mostrar la configuracion del router
+      ios_command:
+        commands:
+          - show run
+      register: config
+      
+    - name: Guardar la configuracion a la carpeta backups
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "./backups/{{ inventory_hostname }}-config.txt"
+        
+    - name: Mostrar la configuracion de las ips del router
+      ios_command:
+        commands:
+          - show ip interface brief
+      register: config
+      
+    - name: Guardar la configuracion a la carpeta ips
+      copy:
+        content: "{{ config.stdout[0] }}"
+        dest: "./ips/{{ inventory_hostname }}-ips.txt"
+        
+  vars:
+    ansible_ssh_user: ansible
+    ansible_ssh_password: ansible
+    ansible_network_os: ios
+    ansible_connection: network_cli

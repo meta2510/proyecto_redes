@@ -1,0 +1,11 @@
+hostname {{ inventory_hostname }}
+!
+!
+interface FastEthernet
+ ip address {{ ansible_host }} 255.255.255.0
+!
+!
+line vty 0 4
+ transport input ssh
+line vty 5 15
+ transport input ssh
